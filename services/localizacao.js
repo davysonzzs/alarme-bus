@@ -14,7 +14,7 @@ export async function pedirPermissao() {
 export function observarPosicao(onPosicao){
     return Location.watchPositionAsync(
         // passando paramentros para monitar, e definindo o intevalo
-        { accuracy: Location.Accuracy.High, distanceInterval: 10 },
+        { accuracy: Location.Accuracy.High, distanceInterval: 1, timeInterval: 1000 },
         // apos isso, retorna posição atual
         (pos) => onPosicao(pos.coords)
     )
