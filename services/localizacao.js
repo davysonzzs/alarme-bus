@@ -3,7 +3,7 @@ import * as Location from "expo-location"
 // * localização é usada apenas para funcionalidades legais do sistemas!
 export async function pedirPermissao() {
     // pedir permisão
-    const { status } = await Location.requestBackgroundPermissionsAsync()
+    const { status } = await Location.requestForegroundPermissionsAsync()
     // se aceita, retorna true / granted
     return status === "granted"
 }
@@ -14,7 +14,7 @@ export async function pedirPermissao() {
 export function observarPosicao(onPosicao){
     return Location.watchPositionAsync(
         // passando paramentros para monitar, e definindo o intevalo
-        { accuracy: Location.Accuracy.Balanced, distanceInterval: 10 },
+        { accuracy: Location.Accuracy.High, distanceInterval: 10 },
         // apos isso, retorna posição atual
         (pos) => onPosicao(pos.coords)
     )

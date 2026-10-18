@@ -7,29 +7,32 @@ export function useDistanciaAoDestino(destino){
     const [ erro, setErro ] = useState(null)
 
     useEffect(() => {
-        // ativo = permisão, usando na espera da permisao
-        let ativo = true
-        // sub = subcription
-        let sub
-        ( async () => {
-            // permisao negada = error e sai da função
-            if(!(await pedirPermissao())){
-                setErro("Permissão negada")
-                return
+        let ativo = true;
+        let sub;
+
+        (async () => {
+            try {
+            const permitido = await pedirPermissao();
+            if (!permitido) {
+                setErro('Permissão de localização negada');
+                return;
             }
-            // criar o sub e faz calulo para retono
-            sub = await observarPosicao((coords) => 
+            setErro(null); // <- a linha que faltava
+            sub = await observarPosicao((coords) =>
                 setDistancia(calcularDistancia(coords, destino))
-            )
-            // desmonta enquanto esperar a permissao
-            if(!ativo) sub.remove()
-        })()
-    return () => {
-        ativo = false
-        sub?.remove()
-    }
-    //quando função nao precisar mais ele se auto desmonta
-    }, [ destino.latitude, destino.longitude])
+            );
+            if (!ativo) sub.remove();
+            } catch (e) {
+            console.log('erro de localização:', e);
+            setErro(String(e));
+            }
+        })();
+
+        return () => {
+            ativo = false;
+            sub?.remove();
+        };
+    }, [destino.latitude, destino.longitude]);
 
     return { distancia, erro }
 }

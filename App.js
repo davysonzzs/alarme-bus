@@ -1,20 +1,15 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
+import { useDistanciaAoDestino } from './hooks/useDistanciaAoDestino';
+
+const DESTINO = { latitude: -4.050817, longitude: -39.449561 };
 
 export default function App() {
+  const { distancia, erro } = useDistanciaAoDestino(DESTINO);
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white' }}>
+      <Text style={{ color: 'black', fontSize: 20 }}>
+        {`distancia: ${distancia} | erro: ${erro}`}
+      </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
