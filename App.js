@@ -1,31 +1,43 @@
 import { useEffect, useState } from 'react';
-import { Button, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
+import MapaDestino from './components/MapaDestino';
+import SeletorRaio from './components/SeletorRaio';
 import {
-  alarmeAtivo,
+  alarmeAtual,
   ativarAlarme,
   cancelarAlarme,
-  dispararNotificacao,
   pedirPermissoes,
+  pedirPrimeiroPlano,
 } from './services/alarme';
 
-const DESTINO = { latitude: -4.050817, longitude: -39.449561 };
-const RAIO_METROS = 200;
-
 export default function App() {
+  const [destino, setDestino] = useState(null);
+  const [raio, setRaio] = useState(1000);
   const [ativo, setAtivo] = useState(false);
+  const [podeLocalizar, setPodeLocalizar] = useState(false);
   const [aviso, setAviso] = useState('');
 
-  // o geofence continua ativo mesmo se o app recarregar, então lemos o estado real
   useEffect(() => {
-    alarmeAtivo().then(setAtivo);
+    pedirPrimeiroPlano().then(setPodeLocalizar);
+    // o geofence continua ativo com o app fechado: restaura destino e raio dele
+    alarmeAtual().then((regiao) => {
+      if (!regiao) return;
+      setDestino({ latitude: regiao.latitude, longitude: regiao.longitude });
+      setRaio(regiao.radius);
+      setAtivo(true);
+    });
   }, []);
 
   async function ligar() {
+    if (!destino) {
+      setAviso('Toque e segure no mapa para escolher o destino');
+      return;
+    }
     if (!(await pedirPermissoes())) {
       setAviso('Permissões negadas');
       return;
     }
-    await ativarAlarme(DESTINO, RAIO_METROS);
+    await ativarAlarme(destino, raio);
     setAtivo(true);
     setAviso('');
   }
@@ -36,11 +48,24 @@ export default function App() {
   }
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, backgroundColor: 'white' }}>
-      <Text style={{ fontSize: 22, color: 'black' }}>{ativo ? 'Alarme ligado' : 'Alarme desligado'}</Text>
-      {aviso ? <Text style={{ color: 'red' }}>{aviso}</Text> : null}
-      <Button title={ativo ? 'Desligar' : 'Ligar alarme'} onPress={ativo ? desligar : ligar} />
-      <Button title="Testar som agora" onPress={dispararNotificacao} />
+    <View style={styles.tela}>
+      <MapaDestino
+        destino={destino}
+        raio={raio}
+        podeLocalizar={podeLocalizar}
+        onEscolherDestino={ativo ? undefined : setDestino}
+      />
+      <View style={styles.painel}>
+        {aviso ? <Text style={styles.aviso}>{aviso}</Text> : null}
+        {!ativo && <SeletorRaio raio={raio} onMudar={setRaio} />}
+        <Button title={ativo ? 'Desligar alarme' : 'Ligar alarme'} onPress={ativo ? desligar : ligar} />
+      </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  tela: { flex: 1 },
+  painel: { position: 'absolute', left: 0, right: 0, bottom: 0, padding: 16, gap: 12, backgroundColor: 'white' },
+  aviso: { color: 'red', textAlign: 'center' },
+});

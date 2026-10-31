@@ -48,9 +48,9 @@ export async function pedirPermissoes() {
     },
   });
 
-  const notificacao = await Notifications.requestPermissionsAsync();
-  const primeiroPlano = await Location.requestForegroundPermissionsAsync();
-  if (!notificacao.granted || !primeiroPlano.granted) return false;
+    const notificacao = await Notifications.requestPermissionsAsync();
+    const primeiroPlano = await pedirPrimeiroPlano();
+    if (!notificacao.granted || !primeiroPlano) return false;
 
   // só depois do primeiro plano; no Android 11+ abre as configurações do sistema
   const segundoPlano = await Location.requestBackgroundPermissionsAsync();
@@ -73,10 +73,13 @@ export function ativarAlarme(destino, raioMetros) {
 export function cancelarAlarme() {
   return Location.stopGeofencingAsync(TAREFA_GEOFENCE);
 }
-
-export async function alarmeAtivo() {
-  // sem permissão de segundo plano não há geofence ativo, e perguntar daria erro
-  const { granted } = await Location.getBackgroundPermissionsAsync();
-  if (!granted) return false;
-  return Location.hasStartedGeofencingAsync(TAREFA_GEOFENCE);
+// devolve a região do geofence ativo (ou null), lida da tarefa registrada
+export async function alarmeAtual() {
+  const opcoes = await TaskManager.getTaskOptionsAsync(TAREFA_GEOFENCE);
+  return opcoes?.regions?.[0] ?? null;
+}
+// novo: pede só a localização com o app aberto (para o ponto azul do mapa)
+export async function pedirPrimeiroPlano() {
+  const { granted } = await Location.requestForegroundPermissionsAsync();
+  return granted;
 }
