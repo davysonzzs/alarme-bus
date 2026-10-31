@@ -28,18 +28,9 @@
     },
     "plugins": [
       [
-        "expo-location",
-        {
-          "isAndroidBackgroundLocationEnabled": true,
-          "isAndroidForegroundServiceEnabled": true
-        }
+        "expo-location", { "isAndroidBackgroundLocationEnabled": true }
       ],
-      [
-        "react-native-maps",
-        {
-          "googleMapsApiKey": "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY"
-        }
-      ],
+      
       "expo-notifications"
     ]
   }
