@@ -25,6 +25,22 @@
       "eas": {
         "projectId": "4e3d0fd8-b366-4c45-ae60-f7e0d7caa690"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "isAndroidBackgroundLocationEnabled": true,
+          "isAndroidForegroundServiceEnabled": true
+        }
+      ],
+      [
+        "react-native-maps",
+        {
+          "googleMapsApiKey": "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY"
+        }
+      ],
+      "expo-notifications"
+    ]
   }
 }
