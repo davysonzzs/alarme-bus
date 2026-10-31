@@ -74,6 +74,9 @@ export function cancelarAlarme() {
   return Location.stopGeofencingAsync(TAREFA_GEOFENCE);
 }
 
-export function alarmeAtivo() {
+export async function alarmeAtivo() {
+  // sem permissão de segundo plano não há geofence ativo, e perguntar daria erro
+  const { granted } = await Location.getBackgroundPermissionsAsync();
+  if (!granted) return false;
   return Location.hasStartedGeofencingAsync(TAREFA_GEOFENCE);
 }
