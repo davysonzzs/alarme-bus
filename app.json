@@ -28,10 +28,13 @@
     },
     "plugins": [
       [
-        "expo-location", { "isAndroidBackgroundLocationEnabled": true }
+        "expo-location",
+        {
+          "isAndroidBackgroundLocationEnabled": true
+        }
       ],
-      
-      "expo-notifications"
+      "expo-notifications",
+      "@maplibre/maplibre-react-native"
     ]
   }
 }
