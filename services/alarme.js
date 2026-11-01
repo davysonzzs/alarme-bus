@@ -83,3 +83,12 @@ export async function pedirPrimeiroPlano() {
   const { granted } = await Location.requestForegroundPermissionsAsync();
   return granted;
 }
+
+export function localizacaoLigada() {
+  return Location.hasServicesEnabledAsync();
+}
+
+export async function localizacaoDisponivel() {
+  const { granted } = await Location.getForegroundPermissionsAsync();
+  return granted && (await localizacaoLigada());
+}

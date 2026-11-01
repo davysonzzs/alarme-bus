@@ -8,6 +8,8 @@ import {
   cancelarAlarme,
   pedirPermissoes,
   pedirPrimeiroPlano,
+  localizacaoLigada,
+  localizacaoDisponivel
 } from './services/alarme';
 
 export default function App() {
@@ -17,18 +19,30 @@ export default function App() {
   const [podeLocalizar, setPodeLocalizar] = useState(false);
   const [aviso, setAviso] = useState('');
 
+  const verificar = () => localizacaoDisponivel().then(setPodeLocalizar);
+
   useEffect(() => {
-    pedirPrimeiroPlano().then(setPodeLocalizar);
+    pedirPrimeiroPlano().then(verificar);
     // o geofence continua ativo com o app fechado: restaura destino e raio dele
     alarmeAtual().then((regiao) => {
       if (!regiao) return;
       setDestino({ latitude: regiao.latitude, longitude: regiao.longitude });
       setRaio(regiao.radius);
       setAtivo(true);
-    });
+    });  
   }, []);
 
+  useEffect(() => {
+    if (podeLocalizar) return;
+    const id = setInterval(verificar, 2000);
+    return () => clearInterval(id);
+  }, [podeLocalizar]);
+
   async function ligar() {
+    if (!(await localizacaoLigada())) {
+      setAviso('Ligue a localização do celular para o alarme funcionar');
+      return;
+    }      
     if (!destino) {
       setAviso('Toque e segure no mapa para escolher o destino');
       return;
@@ -50,6 +64,7 @@ export default function App() {
   return (
     <View style={styles.tela}>
       <MapaDestino
+        key={podeLocalizar ? 'com' : 'sem'}
         destino={destino}
         raio={raio}
         podeLocalizar={podeLocalizar}
