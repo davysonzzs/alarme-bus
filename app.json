@@ -25,6 +25,16 @@
       "eas": {
         "projectId": "4e3d0fd8-b366-4c45-ae60-f7e0d7caa690"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "isAndroidBackgroundLocationEnabled": true
+        }
+      ],
+      "expo-notifications",
+      "@maplibre/maplibre-react-native"
+    ]
   }
 }
