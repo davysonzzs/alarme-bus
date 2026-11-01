@@ -26,8 +26,10 @@ export function dispararNotificacao() {
 // A tarefa precisa ficar no escopo de topo do arquivo
 TaskManager.defineTask(TAREFA_GEOFENCE, ({ data, error }) => {
   if (error) {
-    console.log('erro no geofence:', error.message);
-    return;
+    return Notifications.scheduleNotificationAsync({
+      content: { title: 'Alarme em risco', body: `Erro: ${error.message}` },
+      trigger: { channelId: CANAL_ALARME },
+    });
   }
   if (data.eventType === Location.GeofencingEventType.Enter) {
     return dispararNotificacao();

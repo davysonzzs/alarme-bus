@@ -29,14 +29,16 @@ export default function App() {
       setDestino({ latitude: regiao.latitude, longitude: regiao.longitude });
       setRaio(regiao.radius);
       setAtivo(true);
+      ativarAlarme({ latitude: regiao.latitude, longitude: regiao.longitude }, regiao.radius)
+      .catch(() => {}); // se a localização estiver desligada agora, o aviso em vermelho cobre
     });  
   }, []);
 
   useEffect(() => {
-    if (podeLocalizar) return;
+    if (podeLocalizar && !ativo) return; 
     const id = setInterval(verificar, 2000);
     return () => clearInterval(id);
-  }, [podeLocalizar]);
+  }, [podeLocalizar, ativo]);
 
   async function ligar() {
     if (!(await localizacaoLigada())) {
@@ -72,6 +74,7 @@ export default function App() {
       />
       <View style={styles.painel}>
         {aviso ? <Text style={styles.aviso}>{aviso}</Text> : null}
+        {ativo && !podeLocalizar ? <Text style={styles.aviso}>Localização desligada: o alarme não vai tocar!</Text> : null}
         {!ativo && <SeletorRaio raio={raio} onMudar={setRaio} />}
         <Button title={ativo ? 'Desligar alarme' : 'Ligar alarme'} onPress={ativo ? desligar : ligar} />
       </View>
